@@ -15,7 +15,9 @@ public class Member extends BaseTimeEntity {
     private Long id;
 
     private String email;
+
     private String nickname;
+
     private String password;
 
     @Enumerated(EnumType.STRING)
