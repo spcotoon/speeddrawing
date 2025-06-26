@@ -1,7 +1,11 @@
 package com.spcotoon.speeddrawing.member.controller;
 
+import com.spcotoon.speeddrawing.common.auth.JwtTokenProvider;
 import com.spcotoon.speeddrawing.member.domain.Member;
 import com.spcotoon.speeddrawing.member.dto.MemberCreateReqDto;
+import com.spcotoon.speeddrawing.member.dto.MemberDto;
+import com.spcotoon.speeddrawing.member.dto.MemberLoginReqDto;
+import com.spcotoon.speeddrawing.member.dto.MemberLoginRespDto;
 import com.spcotoon.speeddrawing.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +22,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/create")
-    public ResponseEntity<?> memberCreate(@RequestBody MemberCreateReqDto memberCreateReqDto, HttpServletRequest request) {
-        Member member = memberService.create(memberCreateReqDto, request);
+    public ResponseEntity<?> memberCreate(@RequestBody MemberCreateReqDto dto, HttpServletRequest request) {
+        Member member = memberService.create(dto, request);
 
         return new ResponseEntity<>(member.getId(), HttpStatus.CREATED);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> doLogin(@RequestBody MemberLoginReqDto dto, HttpServletRequest request) {
+        Member member = memberService.login(dto, request);
+
+        String accessToken = jwtTokenProvider.createAccessToken(member.getEmail(), member.getNickname(), member.getRole().getKey());
+
+        MemberLoginRespDto loginInfo
+                = MemberLoginRespDto.builder()
+                .refreshToken(null)
+                .accessToken(accessToken)
+                .user(MemberDto.from(member))
+                .build();
+
+        return new ResponseEntity<>(loginInfo, HttpStatus.OK);
+    }
+
 }
