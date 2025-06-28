@@ -1,7 +1,8 @@
 package com.spcotoon.speeddrawing.member.service;
 
 import com.spcotoon.speeddrawing.IntegrationTestSupport;
-import com.spcotoon.speeddrawing.exception.custom.AlreadyExistException;
+import com.spcotoon.speeddrawing.exception.custom.AlreadyExistEmailException;
+import com.spcotoon.speeddrawing.exception.custom.AlreadyExistNicknameException;
 import com.spcotoon.speeddrawing.exception.custom.InvalidLoginException;
 import com.spcotoon.speeddrawing.member.domain.Member;
 import com.spcotoon.speeddrawing.member.dto.MemberCreateReqDto;
@@ -88,7 +89,7 @@ class MemberServiceTest extends IntegrationTestSupport {
 
         //when
         //then
-        assertThatThrownBy(() -> memberService.create(dto, request)).isInstanceOf(AlreadyExistException.class);
+        assertThatThrownBy(() -> memberService.create(dto, request)).isInstanceOf(AlreadyExistEmailException.class);
     }
 
     @DisplayName("회원가입 실패 - 닉네임 중복")
@@ -116,7 +117,7 @@ class MemberServiceTest extends IntegrationTestSupport {
 
         //when
         //then
-        assertThatThrownBy(() -> memberService.create(dto, request)).isInstanceOf(AlreadyExistException.class);
+        assertThatThrownBy(() -> memberService.create(dto, request)).isInstanceOf(AlreadyExistNicknameException.class);
     }
 
     private static final String TEST_EMAIL = "test@naver.com";

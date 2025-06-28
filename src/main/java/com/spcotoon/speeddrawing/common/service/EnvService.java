@@ -10,6 +10,10 @@ public class EnvService {
     private String activeProfile;
 
     public boolean isProd() {
+        if (activeProfile == null || activeProfile.isEmpty()) {
+            return false;
+        }
+
         return "prod".equalsIgnoreCase(activeProfile);
     }
 }

@@ -1,7 +1,8 @@
 package com.spcotoon.speeddrawing.member.service;
 
 import com.spcotoon.speeddrawing.common.service.EnvService;
-import com.spcotoon.speeddrawing.exception.custom.AlreadyExistException;
+import com.spcotoon.speeddrawing.exception.custom.AlreadyExistEmailException;
+import com.spcotoon.speeddrawing.exception.custom.AlreadyExistNicknameException;
 import com.spcotoon.speeddrawing.exception.custom.InvalidLoginException;
 import com.spcotoon.speeddrawing.member.domain.Member;
 import com.spcotoon.speeddrawing.member.dto.MemberCreateReqDto;
@@ -32,11 +33,11 @@ public class MemberService {
 
         try {
             if (memberRepository.findByEmail(dto.getEmail()).isPresent()) {
-                throw new AlreadyExistException();
+                throw new AlreadyExistEmailException();
             }
 
             if (memberRepository.findByNickname(dto.getNickname()).isPresent()) {
-                throw new AlreadyExistException();
+                throw new AlreadyExistNicknameException();
             }
 
             Member newMember = Member.builder()

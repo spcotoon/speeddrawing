@@ -8,6 +8,7 @@ import com.spcotoon.speeddrawing.member.dto.MemberLoginReqDto;
 import com.spcotoon.speeddrawing.member.dto.MemberLoginRespDto;
 import com.spcotoon.speeddrawing.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/create")
-    public ResponseEntity<?> memberCreate(@RequestBody MemberCreateReqDto dto, HttpServletRequest request) {
+    public ResponseEntity<?> memberCreate(@Valid @RequestBody MemberCreateReqDto dto, HttpServletRequest request) {
         Member member = memberService.create(dto, request);
 
         return new ResponseEntity<>(member.getId(), HttpStatus.CREATED);
