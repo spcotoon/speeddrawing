@@ -41,4 +41,14 @@ public class JwtTokenProvider {
     public Key getSigningKey() {
         return SECRET_KEY;
     }
+
+    public String getNicknameFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return (String) claims.get("nickname");
+    }
 }
