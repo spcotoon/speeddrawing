@@ -2,6 +2,7 @@ package com.spcotoon.speeddrawing.common.config;
 
 import com.spcotoon.speeddrawing.common.auth.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,16 +19,25 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] PUBLIC_URLS = {
       "/health",
       "/api/v1/member/create",
       "/api/v1/member/login",
+      "/connect/**",
       "/h2-console/**"
     };
 
+
+    private final String clientUrl;
     private final JwtAuthFilter jwtAuthFilter;
+
+    public SecurityConfig(@Value("${client.url}") String clientUrl, JwtAuthFilter jwtAuthFilter) {
+        this.clientUrl = clientUrl;
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
+
+
 
     @Bean
     public SecurityFilterChain myFilter(HttpSecurity httpSecurity) throws Exception {
@@ -47,7 +57,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of(clientUrl));
         configuration.setAllowedMethods(List.of("*")); //모든 HTTP 메서드 허용
         configuration.setAllowedHeaders(List.of("*")); //모든 헤더값 허용
         configuration.setAllowCredentials(true); //자격증명허용

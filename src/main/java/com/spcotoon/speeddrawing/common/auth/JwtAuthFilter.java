@@ -7,6 +7,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -26,6 +27,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends GenericFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -63,9 +65,20 @@ public class JwtAuthFilter extends GenericFilter {
 
             chain.doFilter(request, response);
         } catch (Exception e) {
-            if (!envService.isProd()) {
-                e.printStackTrace();
+            String clientIp = ((HttpServletRequest) request).getHeader("X-Forwarded-For");
+            if (clientIp == null) {
+                clientIp = request.getRemoteAddr();
             }
+
+            String uri = httpServletRequest.getRequestURI();
+            String ua = httpServletRequest.getHeader("User-Agent");
+            String snippet = token != null && token.length() > 20
+                    ? token.substring(0, 10) + "..." + token.substring(token.length() - 10)
+                    : token;
+
+            log.warn("JWT 검증 실패 | ip={} | uri={} | userAgent={} | tokenSnippet={} | error={}",
+                    clientIp, uri, ua, snippet, e.getMessage());
+            log.debug("JWT parse error stacktrace", e);
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             httpServletResponse.setContentType(String.valueOf(MediaType.APPLICATION_JSON));
             httpServletResponse.getWriter().write("invalid token");

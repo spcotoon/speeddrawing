@@ -54,10 +54,10 @@ public class MemberService {
             return member;
         } catch (Exception e) {
             if (envService.isProd()) {
-                log.error("회원 가입 실패 | Email: {} | IP: {} | User-Agent: {} | 오류: {}",
+                log.warn("회원 가입 실패 | Email: {} | IP: {} | User-Agent: {} | 오류: {}",
                         dto.getEmail(), clientIp, userAgent, e.getMessage());
             } else {
-                log.error("회원 가입 실패 | Email: {} | IP: {} | User-Agent: {} | 오류: {}",
+                log.warn("회원 가입 실패 | Email: {} | IP: {} | User-Agent: {} | 오류: {}",
                         dto.getEmail(), clientIp, userAgent, e.getMessage(), e);
             }
 
