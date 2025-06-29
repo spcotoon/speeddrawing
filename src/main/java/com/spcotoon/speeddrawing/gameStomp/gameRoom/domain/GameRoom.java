@@ -28,5 +28,10 @@ public class GameRoom {
     private final List<GameRoomParticipant> gameRoomParticipants = new ArrayList<>();
 
     @OneToMany(mappedBy = "gameRoom", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private final List<GameRoomMessage> gameRoomMessages =new ArrayList<>();
+    private final List<GameRoomMessage> gameRoomMessages = new ArrayList<>();
+
+    public GameRoom(String title) {
+        this.title = title;
+        this.status = GameRoomStatus.WAITING;
+    }
 }
