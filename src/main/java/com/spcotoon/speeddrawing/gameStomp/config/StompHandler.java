@@ -27,28 +27,50 @@ public class StompHandler implements ChannelInterceptor {
             return message;
         }
 
+        if (StompCommand.SEND == accessor.getCommand()) {
+            String destination = accessor.getDestination();
+
+            // 로비 관련 SEND 메시지는 토큰 없어도 허용
+            if (destination != null && destination.startsWith("/publish/lobby")) {
+                return message;
+            }
+
+            // 그 외는 토큰 필수
+            String bearerToken = accessor.getFirstNativeHeader("Authorization");
+            if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+                throw new IllegalArgumentException("JWT token is missing or invalid format (Bearer required) for SEND");
+            }
+            String token = bearerToken.substring(7);
+            Jwts.parserBuilder()
+                    .setSigningKey(jwtTokenProvider.getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return message;
+        }
         // /topic/lobby 구독도 토큰 없이 가능. (비회원이 로비 볼 수 있음)
         if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
             String destination = accessor.getDestination();
 
             if (destination != null && destination.startsWith("/topic/lobby")) {
                 return message;
+            } else {
+                String bearerToken = accessor.getFirstNativeHeader("Authorization");
+                if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+                    throw new IllegalArgumentException("JWT token is missing or invalid format (Bearer required)");
+                }
+
+                String token = bearerToken.substring(7);
+                Jwts.parserBuilder()
+                        .setSigningKey(jwtTokenProvider.getSigningKey())
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
+
+                return message;
             }
         }
-
-        // 로비 외 (게임 방) 구독이면 토큰 검증(회원만 게임방 입장 가능)
-        String bearerToken = accessor.getFirstNativeHeader("Authorization");
-        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
-            throw new IllegalArgumentException("JWT token is missing or invalid format (Bearer required)");
-        }
-
-        String token = bearerToken.substring(7);
-        Jwts.parserBuilder()
-                .setSigningKey(jwtTokenProvider.getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
         return message;
     }
 }

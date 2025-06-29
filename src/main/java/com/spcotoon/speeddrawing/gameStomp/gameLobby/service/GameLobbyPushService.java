@@ -1,7 +1,8 @@
 package com.spcotoon.speeddrawing.gameStomp.gameLobby.service;
 
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyGameRoomPubDto;
-import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserPubDto;
+import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserDto;
+import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserListPubDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class GameLobbyPushService {
     }
 
 
-    public void publishUserListInLobby(List<LobbyUserPubDto> users) {
+    public void publishUserListInLobby(LobbyUserListPubDto users) {
         messagingTemplate.convertAndSend("/topic/lobby/users", users);
     }
 }

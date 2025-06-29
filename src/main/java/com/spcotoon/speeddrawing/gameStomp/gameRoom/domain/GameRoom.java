@@ -17,7 +17,12 @@ public class GameRoom {
     @Column(name = "game_room_id")
     private Long id;
 
-    private String name;
+    private String title;
+
+    @Enumerated(EnumType.STRING)
+    private GameRoomStatus status;
+
+    private final Integer maxParticipants = 4;
 
     @OneToMany(mappedBy = "gameRoom", cascade = CascadeType.REMOVE)
     private final List<GameRoomParticipant> gameRoomParticipants = new ArrayList<>();
