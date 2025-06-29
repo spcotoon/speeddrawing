@@ -127,7 +127,7 @@ class JwtAuthFilterTest {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("jwtAuthFilter 통과 실패 - 유효하지 않은 토큰으로 authenticated() url 요청 실패")
+    @DisplayName("jwtAuthFilter 통과 실패 - 유효하지 않은 (페이로드 변조된) 토큰으로 authenticated() url 요청 실패")
     @Test
     void invalid_token_return401() throws Exception {
         //given
@@ -146,12 +146,17 @@ class JwtAuthFilterTest {
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode jsonNode = objectMapper.readTree(loginResponse);
-        String accessToken = "Bearer " + "invalid" + jsonNode.get("accessToken").asText();
+
+        String validToken = jsonNode.get("accessToken").asText();
+
+        String invalidToken = validToken + 'a';
+
+        String bearerInvalidToken = "Bearer " + invalidToken;
 
         //when
         //then
         mockMvc.perform(get(TOKEN_TEST_URL)
-                        .header("Authorization", accessToken)
+                        .header("Authorization", bearerInvalidToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("invalid token"));
