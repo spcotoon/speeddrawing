@@ -4,6 +4,7 @@ import com.spcotoon.speeddrawing.gameStomp.gameRoom.dto.GameRoomCreateReqDto;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.service.GameRoomService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,8 @@ public class GameRoomController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createRoom(@RequestBody GameRoomCreateReqDto dto, HttpServletRequest request) {
-        gameRoomService.create(dto, request);
+        Long roomId = gameRoomService.create(dto, request);
+
+        return new ResponseEntity<>(roomId, HttpStatus.OK);
     }
 }

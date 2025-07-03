@@ -4,6 +4,7 @@ import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyGameRoomPubDto;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserDto;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserListPubDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ public class GameLobbyPushService {
 
     public void publishRoomListInLobby(List<LobbyGameRoomPubDto> rooms) {
         messagingTemplate.convertAndSend("/topic/lobby/rooms", rooms);
+
     }
 
 

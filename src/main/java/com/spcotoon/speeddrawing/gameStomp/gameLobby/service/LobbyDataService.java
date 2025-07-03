@@ -5,7 +5,7 @@ import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserDto;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserListPubDto;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.domain.GameRoom;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.repository.GameRoomRepository;
-import com.spcotoon.speeddrawing.gameStomp.util.SessionUserRegistry;
+import com.spcotoon.speeddrawing.gameStomp.util.RedisSessionUserRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LobbyDataService {
 
-    private final SessionUserRegistry sessionUserRegistry;
+    private final RedisSessionUserRegistry redisSessionUserRegistry;
     private final GameRoomRepository gameRoomRepository;
 
     public LobbyUserListPubDto getCurrentUsers() {
-        List<LobbyUserDto> users = sessionUserRegistry.getAllConnectedUsers().stream()
+        List<LobbyUserDto> users = redisSessionUserRegistry.getAllConnectedUsers().stream()
                 .map(nickname -> new LobbyUserDto(null, nickname))
                 .collect(Collectors.toList());
 
@@ -36,7 +36,7 @@ public class LobbyDataService {
                 .roomId(room.getId())
                 .title(room.getTitle())
                 .status(String.valueOf(room.getStatus()))
-                .currentParticipants(room.getGameRoomParticipants().size())
+//                .currentParticipants(room.getGameRoomParticipants().size())
                 .maxParticipants(room.getMaxParticipants()).build()).toList();
     }
 }
