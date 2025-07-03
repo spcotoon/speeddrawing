@@ -1,4 +1,4 @@
-package com.spcotoon.speeddrawing.gameStomp.gameRoom.domain;
+package com.spcotoon.speeddrawing.gameStomp.gameRoom.session;
 
 public enum GameRoomStatus {
     WAITING("WAITING", "대기중"),

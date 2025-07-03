@@ -82,6 +82,8 @@ public class JwtAuthFilter extends GenericFilter {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             httpServletResponse.setContentType(String.valueOf(MediaType.APPLICATION_JSON));
             httpServletResponse.getWriter().write("invalid token");
+            httpServletResponse.getWriter().flush();
+            return;
         }
     }
 }

@@ -19,7 +19,7 @@ public class GameRoomController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createRoom(@RequestBody GameRoomCreateReqDto dto, HttpServletRequest request) {
-        Long roomId = gameRoomService.create(dto, request);
+        String roomId = gameRoomService.create(dto, request);
 
         return new ResponseEntity<>(roomId, HttpStatus.OK);
     }

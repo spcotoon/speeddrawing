@@ -29,7 +29,20 @@ public class RedisGameSubService implements MessageListener {
             return; // 처리 후 종료
         }
 
-        // 기존 고정 채널 처리
+        if (actualChannel.startsWith("gameRoomInfo:")) {
+            String roomId = actualChannel.substring("gameRoomInfo:".length());
+            messageTemplate.convertAndSend("/topic/game-room/" + roomId + "/info", body);
+            return;
+        }
+
+        if (actualChannel.startsWith("gameDrawing:")) {
+            String roomId = actualChannel.substring("gameDrawing:".length());
+            messageTemplate.convertAndSend("/topic/game-room/" + roomId + "/drawing", body);
+            return;
+        }
+
+
+        // 기존 고정 채널 처리 [여긴 완료]
         switch (actualChannel) {
             case "lobbyRooms":
                 messageTemplate.convertAndSend("/topic/lobby/rooms", body);

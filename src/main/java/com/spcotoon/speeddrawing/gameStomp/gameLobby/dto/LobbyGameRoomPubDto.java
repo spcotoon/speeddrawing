@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class LobbyGameRoomPubDto {
-    private Long roomId;
+    private String roomId;
     private String title;
     private String status;
     private Integer currentParticipants;

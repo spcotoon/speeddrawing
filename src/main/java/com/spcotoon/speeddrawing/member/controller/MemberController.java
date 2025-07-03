@@ -36,7 +36,7 @@ public class MemberController {
     public ResponseEntity<?> doLogin(@RequestBody MemberLoginReqDto dto, HttpServletRequest request) {
         Member member = memberService.login(dto, request);
 
-        String accessToken = jwtTokenProvider.createAccessToken(member.getEmail(), member.getNickname(), member.getRole().getKey());
+        String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getEmail(), member.getNickname(), member.getRole().getKey());
 
         MemberLoginRespDto loginInfo
                 = MemberLoginRespDto.builder()

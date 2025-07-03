@@ -1,11 +1,13 @@
 package com.spcotoon.speeddrawing.gameStomp.gameRoom.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spcotoon.speeddrawing.common.auth.JwtTokenProvider;
-import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.GameLobbyPushService;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.LobbyDataService;
-import com.spcotoon.speeddrawing.gameStomp.gameRoom.domain.GameRoom;
+import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.RedisLobbyPushService;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.dto.GameRoomCreateReqDto;
-import com.spcotoon.speeddrawing.gameStomp.gameRoom.repository.GameRoomRepository;
+import com.spcotoon.speeddrawing.gameStomp.gameRoom.registry.RedisGameRoomSessionRegistry;
+import com.spcotoon.speeddrawing.gameStomp.gameRoom.session.GameRoomSession;
+import com.spcotoon.speeddrawing.gameStomp.gameRoom.session.GameRoomStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GameRoomService {
 
-    private final GameRoomRepository gameRoomRepository;
+    private final RedisGameRoomSessionRegistry registry;
     private final JwtTokenProvider jwtTokenProvider;
-    private final GameLobbyPushService pushService;
+    private final RedisLobbyPushService pushService;
     private final LobbyDataService lobbyDataService;
 
-    public Long create(GameRoomCreateReqDto dto, HttpServletRequest request) {
+    public String create(GameRoomCreateReqDto dto, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         String nickname = "";
         String clientIp = request.getRemoteAddr();
@@ -35,13 +37,24 @@ public class GameRoomService {
             nickname = jwtTokenProvider.getNicknameFromToken(token);
         }
 
-        GameRoom gameRoom = dto.toEntity();
-        gameRoomRepository.save(gameRoom);
+        String roomId = String.valueOf(System.currentTimeMillis());
 
-        log.info("방 생성 - title={} | createdBy={} | IP: {} | User-Agent: {} | Referer: {}", gameRoom.getTitle(), nickname, clientIp, userAgent, referer);
+        GameRoomSession gameRoomSession = GameRoomSession.builder()
+                .roomId(roomId)
+                .title(dto.getTitle())
+                .status(GameRoomStatus.WAITING)
+                .participantsCount(0)
+                .maxCount(4)
+                .build();
 
-        pushService.publishRoomListInLobby(lobbyDataService.getCurrentRooms());
-        return gameRoom.getId();
+        log.info("방 생성 - title={} | createdBy={} | IP: {} | User-Agent: {} | Referer: {}", gameRoomSession.getTitle(), nickname, clientIp, userAgent, referer);
+        registry.createRoom(gameRoomSession);
+        try {
+            pushService.publishRoomList(lobbyDataService.getCurrentRooms());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return gameRoomSession.getRoomId();
     }
 
 }

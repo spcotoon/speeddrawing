@@ -24,8 +24,9 @@ public class JwtTokenProvider {
         this.SECRET_KEY = new SecretKeySpec(java.util.Base64.getDecoder().decode(secretKey), SignatureAlgorithm.HS512.getJcaName());
     }
 
-    public String createAccessToken(String email, String nickname ,String role) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createAccessToken(Long id, String email, String nickname ,String role) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(id));
+        claims.put("email", email);
         claims.put("nickname", nickname);
         claims.put("role", role);
         Date now = new Date();
@@ -50,5 +51,22 @@ public class JwtTokenProvider {
                 .getBody();
 
         return (String) claims.get("nickname");
+    }
+
+    public JwtTokenUserInfo getUserInfoFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        Long memberId = claims.get("memberId", Long.class);
+        String email = claims.get("email", String.class);
+        String nickname = claims.get("nickname", String.class);
+
+        return JwtTokenUserInfo.builder()
+                .memberId(memberId)
+                .email(email)
+                .nickname(nickname)
+                .build();
     }
 }

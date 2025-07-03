@@ -1,5 +1,6 @@
 package com.spcotoon.speeddrawing.gameStomp.gameRoom.domain;
 
+import com.spcotoon.speeddrawing.gameStomp.gameRoom.session.GameRoomStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

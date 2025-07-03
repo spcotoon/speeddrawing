@@ -1,7 +1,6 @@
 package com.spcotoon.speeddrawing.gameStomp.gameLobby.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.GameLobbyPushService;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.LobbyDataService;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.RedisLobbyPushService;
 import lombok.RequiredArgsConstructor;
@@ -12,17 +11,8 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class LobbyStompController {
 
-//    private final GameLobbyPushService pushService;
     private final LobbyDataService dataService;
     private final RedisLobbyPushService pushService;
-
- /*
-    @MessageMapping("/lobby/init")
-    public void initLobby() {
-        pushService.publishRoomListInLobby(dataService.getCurrentRooms());
-        pushService.publishUserListInLobby(dataService.getCurrentUsers());
-    }
-*/
 
     @MessageMapping("/lobby/init")
     public void initLobby() throws JsonProcessingException {
