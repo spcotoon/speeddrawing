@@ -59,7 +59,8 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        Long memberId = claims.get("memberId", Long.class);
+        String memberIdStr = claims.get("sub", String.class);
+        Long memberId = Long.valueOf(memberIdStr);
         String email = claims.get("email", String.class);
         String nickname = claims.get("nickname", String.class);
 

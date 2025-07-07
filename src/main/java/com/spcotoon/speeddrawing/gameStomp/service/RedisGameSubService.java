@@ -17,8 +17,7 @@ public class RedisGameSubService implements MessageListener {
         String actualChannel = new String(message.getChannel());
         String body = new String(message.getBody());
 
-        // 예시: GameMessageDto 같은 객체로 변환하여 사용
-        // GameMessageDto chatMessage = objectMapper.readValue(body, GameMessageDto.class);
+        //RedisConfig 에서 등록한 채널들
 
         // 패턴 기반으로 동적 라우팅
         if (actualChannel.startsWith("gameChat:")) {

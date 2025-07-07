@@ -22,36 +22,79 @@ public class RedisUserSessionRegistry {
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
+    private String getRedisKey(UserSession userSession) {
+        if (userSession.getMemberId() != null) {
+            return "member:" + userSession.getMemberId();
+        } else {
+            return "guest:" + userSession.getSessionId();
+        }
+    }
+
+    public void unregisterUserByKey(String key) {
+        if (key == null || key.isEmpty()) return;
+        redisTemplate.opsForHash().delete(KEY, key);
+    }
+
     public void registerUser(UserSession userSession) {
         try {
             String json = objectMapper.writeValueAsString(userSession);
-            redisTemplate.opsForHash().put(KEY, userSession.getSessionId(), json);
-
+            String redisKey = getRedisKey(userSession);
+            redisTemplate.opsForHash().put(KEY, redisKey, json);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void unregisterUser(String sessionId) {
+    public UserSession getUserByNickname(String nickname) {
         Map<Object, Object> all = redisTemplate.opsForHash().entries(KEY);
         for (Map.Entry<Object, Object> entry : all.entrySet()) {
-            String jsonOrNickname = entry.getValue().toString();
-
             try {
-                UserSession userSession = objectMapper.readValue(jsonOrNickname, UserSession.class);
-                if (sessionId.equals(userSession.getSessionId())) {
-                    redisTemplate.opsForHash().delete(KEY, entry.getKey());
-                    break;
+                UserSession user = objectMapper.readValue(entry.getValue().toString(), UserSession.class);
+                if (nickname.equals(user.getNickname())) {
+                    // UserSession에 redisKey 저장할 수 있도록 setter 또는 빌더에 추가해두면 좋음
+                    user.setRedisKey(entry.getKey().toString());
+                    return user;
                 }
             } catch (IOException e) {
-                // 만약 value가 JSON이 아니면, 그냥 닉네임 문자열일 수 있다
-                if (jsonOrNickname.equals(sessionId)) {
-                    redisTemplate.opsForHash().delete(KEY, entry.getKey());
-                    break;
-                }
-                log.warn("Failed to parse redis value for key={}, value={}", entry.getKey(), jsonOrNickname, e);
+                log.warn("Failed to parse user session JSON", e);
             }
         }
+        return null;
+    }
+    public void unregisterUserByMemberId(Long memberId) {
+        if (memberId == null) return;
+        String key = "member:" + memberId;
+        redisTemplate.opsForHash().delete(KEY, key);
+    }
+
+    public void unregisterUserBySessionId(String sessionId) {
+        Map<Object, Object> all = redisTemplate.opsForHash().entries(KEY);
+        for (Map.Entry<Object, Object> entry : all.entrySet()) {
+            try {
+                UserSession user = objectMapper.readValue(entry.getValue().toString(), UserSession.class);
+                if (sessionId.equals(user.getSessionId())) {
+                    redisTemplate.opsForHash().delete(KEY, entry.getKey());
+                    return;
+                }
+            } catch (IOException e) {
+                log.warn("Failed to parse user session JSON", e);
+            }
+        }
+    }
+
+    public UserSession getUserBySessionId(String sessionId) {
+        Map<Object, Object> all = redisTemplate.opsForHash().entries(KEY);
+        for (Map.Entry<Object, Object> entry : all.entrySet()) {
+            try {
+                UserSession user = objectMapper.readValue(entry.getValue().toString(), UserSession.class);
+                if (sessionId.equals(user.getSessionId())) {
+                    return user;
+                }
+            } catch (IOException e) {
+                log.warn("Failed to parse user session JSON", e);
+            }
+        }
+        return null;
     }
 
     public List<UserSession> getAllConnectedUsers() {
@@ -64,20 +107,5 @@ public class RedisUserSessionRegistry {
                         throw new RuntimeException(e);
                     }
                 }).toList();
-    }
-
-    public UserSession getUserBySessionId(String sessionId) {
-        Map<Object, Object> all = redisTemplate.opsForHash().entries(KEY);
-        for (Object value : all.values()) {
-            try {
-                UserSession user = objectMapper.readValue(value.toString(), UserSession.class);
-                if (sessionId.equals(user.getSessionId())) {
-                    return user;
-                }
-            } catch (IOException e) {
-                log.warn("Failed to parse user session JSON", e);
-            }
-        }
-        return null;
     }
 }

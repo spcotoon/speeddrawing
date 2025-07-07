@@ -13,4 +13,5 @@ public class LobbyUserDto {
     private Long memberId;
     private String email;
     private String nickname;
+    private String purpose;
 }

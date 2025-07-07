@@ -15,4 +15,5 @@ public class UserSession {
     private Long memberId;
     private String purpose;
     private String roomId;
+    private String redisKey;
 }

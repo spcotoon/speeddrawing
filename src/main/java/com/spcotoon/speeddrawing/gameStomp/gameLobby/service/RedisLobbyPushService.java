@@ -29,7 +29,4 @@ public class RedisLobbyPushService {
         redisTemplate.convertAndSend("lobbyUsers", users);
     }
 
-    public void publishGameChat(String chatJson) {
-        redisTemplate.convertAndSend("gameChat", chatJson);
-    }
 }

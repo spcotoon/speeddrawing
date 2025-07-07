@@ -1,4 +1,4 @@
-package com.spcotoon.speeddrawing.gameStomp.gameLobby.eventListener;
+package com.spcotoon.speeddrawing.gameStomp.eventListener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spcotoon.speeddrawing.common.auth.JwtTokenProvider;
@@ -7,6 +7,7 @@ import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.LobbyDataService;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.RedisLobbyPushService;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.registry.RedisUserSessionRegistry;
 import com.spcotoon.speeddrawing.gameStomp.gameLobby.session.UserSession;
+import com.spcotoon.speeddrawing.gameStomp.gameRoom.registry.RedisGameRoomSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -21,14 +22,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class StompEventListener {
-    private final RedisUserSessionRegistry registry;
+
+    private final RedisUserSessionRegistry userRegistry;
+    private final RedisGameRoomSessionRegistry roomRegistry;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisLobbyPushService pushService;
     private final LobbyDataService lobbyDataService;
+
     @EventListener
     public void connectHandle(SessionConnectEvent event) throws JsonProcessingException {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String purpose = accessor.getFirstNativeHeader("purpose");
+
         if ("lobby".equals(purpose)) {
             Long memberId = null;
             String nickname;
@@ -53,14 +58,10 @@ public class StompEventListener {
                     .purpose(purpose)
                     .build();
 
-            registry.registerUser(userSession);
-
+            userRegistry.registerUser(userSession);
             pushService.publishUserList(lobbyDataService.getCurrentUsers());
-        } else if ("game-room".equals(purpose)) {
-            //게임룸에 레지스터
         }
-
-
+        // game-room 은 여기서 joinRoom 하지 않음 (Interceptor (StompHandler) 에서 이미 처리됨)
     }
 
     @EventListener
@@ -69,19 +70,15 @@ public class StompEventListener {
         String sessionId = accessor.getSessionId();
 
         if (sessionId != null) {
-            // Redis에서 세션 정보 찾아오기
-            UserSession userSession = registry.getUserBySessionId(sessionId);
+            UserSession userSession = userRegistry.getUserBySessionId(sessionId);
             if (userSession != null) {
                 String purpose = userSession.getPurpose();
                 if ("lobby".equals(purpose)) {
-                    registry.unregisterUser(sessionId);
+                    userRegistry.unregisterUserBySessionId(sessionId);
                     log.info("Lobby WebSocket Disconnect - sessionId: {}", sessionId);
                     pushService.publishUserList(lobbyDataService.getCurrentUsers());
-                } else if ("game-room".equals(purpose)) {
-                    // 게임룸 레지스트리에서 해당 세션 제거
                 }
-            } else {
-                log.warn("Disconnect: user session not found for sessionId={}", sessionId);
+                // game-room disconnect는 pub 메시지에서 처리하므로 여기선 안함
             }
         }
     }

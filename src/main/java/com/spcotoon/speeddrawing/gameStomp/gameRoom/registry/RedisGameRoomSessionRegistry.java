@@ -2,6 +2,7 @@ package com.spcotoon.speeddrawing.gameStomp.gameRoom.registry;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spcotoon.speeddrawing.exception.custom.FullRoomException;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.session.GameRoomSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RedisGameRoomSessionRegistry {
 
-    private static final String KEY = "lobby:rooms";
+    private static final String KEY = "game-room";
 
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
@@ -30,10 +37,6 @@ public class RedisGameRoomSessionRegistry {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void deleteRoom(String roomId) {
-        redisTemplate.opsForHash().delete(KEY, roomId);
     }
 
     public List<GameRoomSession> getAllRooms() {
@@ -60,6 +63,87 @@ public class RedisGameRoomSessionRegistry {
             throw new RuntimeException(e);
         }
     }
+
+    public void joinRoom(String roomId, String nickname) {
+        Object value = redisTemplate.opsForHash().get(KEY, roomId);
+
+        try {
+            GameRoomSession session = objectMapper.readValue(value.toString(), GameRoomSession.class);
+
+            if (session.getParticipants() == null) {
+                session.setParticipants(new ArrayList<>());
+            }
+
+            int currentCount = session.getParticipants().size();
+
+
+            if (currentCount >= session.getMaxCount()) {
+                throw new FullRoomException();
+            }
+
+            if (!session.getParticipants().contains(nickname)) {
+                session.getParticipants().add(nickname);
+                session.setParticipantsCount(session.getParticipants().size());
+            }
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String now = LocalDateTime.now().format(formatter);
+
+
+            if (session.getJoinedAt() == null) {
+                session.setJoinedAt(new HashMap<>());
+            }
+
+            if (!session.getJoinedAt().containsKey(nickname)) {
+                session.getJoinedAt().put(nickname, now);
+            }
+
+            String updatedJson = objectMapper.writeValueAsString(session);
+            redisTemplate.opsForHash().put(KEY, roomId, updatedJson);
+
+        } catch (JsonProcessingException e) {
+            log.error("Failed to join game room: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void leaveRoom(String roomId, String nickname) {
+        Object value = redisTemplate.opsForHash().get(KEY, roomId);
+        if (value == null) {
+            log.warn("방이 존재하지 않습니다. roomId={}", roomId);
+            return; // 방이 없으면 그냥 종료
+        }
+
+        try {
+            GameRoomSession session = objectMapper.readValue(value.toString(), GameRoomSession.class);
+
+            if (session.getParticipants() != null && session.getParticipants().contains(nickname)) {
+                session.getParticipants().remove(nickname);
+                session.setParticipantsCount(session.getParticipants().size());
+
+
+
+                if (session.getParticipantsCount() == 0) {
+                    // 참가자가 0명이면 방 삭제
+                    redisTemplate.opsForHash().delete(KEY, roomId);
+                    log.info("빈 방 삭제 roomId={}", roomId);
+                } else {
+                    // 참가자 남아있으면 업데이트
+                    String updatedJson = objectMapper.writeValueAsString(session);
+                    redisTemplate.opsForHash().put(KEY, roomId, updatedJson);
+                    log.info("방에서 퇴장 처리 roomId={} nickname={}", roomId, nickname);
+                }
+            } else {
+                log.warn("방에 참가자가 없거나 해당 닉네임이 존재하지 않음 roomId={}, nickname={}", roomId, nickname);
+            }
+
+        } catch (JsonProcessingException e) {
+            log.error("leaveRoom 처리 실패 roomId={}, nickname={}, error={}", roomId, nickname, e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
 
 

@@ -26,6 +26,7 @@ public class LobbyDataService {
                 .map(us-> LobbyUserDto.builder()
                         .memberId(us.getMemberId())
                         .nickname(us.getNickname())
+                        .purpose(us.getPurpose())
                         .build()).toList();
 
         int totalCount = users.size();

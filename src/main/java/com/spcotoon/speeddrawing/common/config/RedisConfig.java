@@ -53,8 +53,9 @@ public class RedisConfig {
         container.setConnectionFactory(redisConnectionFactory);
         container.addMessageListener(messageListenerAdapter, new PatternTopic("lobbyRooms"));
         container.addMessageListener(messageListenerAdapter, new PatternTopic("lobbyUsers"));
-        container.addMessageListener(messageListenerAdapter, new PatternTopic("gameSession"));
-        container.addMessageListener(messageListenerAdapter, new PatternTopic("gameChat"));
+        container.addMessageListener(messageListenerAdapter, new PatternTopic("gameChat:*"));
+        container.addMessageListener(messageListenerAdapter, new PatternTopic("gameRoomInfo:*"));
+        container.addMessageListener(messageListenerAdapter, new PatternTopic("gameDrawing:*"));
         return container;
     }
 
