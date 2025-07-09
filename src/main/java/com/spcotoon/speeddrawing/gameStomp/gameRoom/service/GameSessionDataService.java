@@ -1,8 +1,5 @@
 package com.spcotoon.speeddrawing.gameStomp.gameRoom.service;
 
-import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserDto;
-import com.spcotoon.speeddrawing.gameStomp.gameLobby.dto.LobbyUserListPubDto;
-import com.spcotoon.speeddrawing.gameStomp.gameLobby.session.UserSession;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.dto.GameSessionPubDto;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.registry.RedisGameRoomSessionRegistry;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.session.GameRoomSession;
