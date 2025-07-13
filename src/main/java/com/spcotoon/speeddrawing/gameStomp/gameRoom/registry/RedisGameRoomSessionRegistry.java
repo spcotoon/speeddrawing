@@ -14,10 +14,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -84,6 +81,11 @@ public class RedisGameRoomSessionRegistry {
             if (!session.getParticipants().contains(nickname)) {
                 session.getParticipants().add(nickname);
                 session.setParticipantsCount(session.getParticipants().size());
+
+                if (session.getScore() == null) {
+                    session.setScore(new HashMap<>());
+                }
+                session.getScore().put(nickname, 0);
             }
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -119,8 +121,24 @@ public class RedisGameRoomSessionRegistry {
 
             if (session.getParticipants() != null && session.getParticipants().contains(nickname)) {
                 session.getParticipants().remove(nickname);
+                session.getJoinedAt().remove(nickname);
+                session.getScore().remove(nickname);
                 session.setParticipantsCount(session.getParticipants().size());
 
+                if (nickname.equals(session.getRoomOwner())) {
+                    if (session.getParticipantsCount() > 0) {
+                        // joinedAt 중 가장 먼저 들어온 사람 찾기
+                        String newOwner = session.getParticipants().stream()
+                                .min(Comparator.comparing(participant -> session.getJoinedAt().get(participant)))
+                                .orElse(null);
+
+                        session.setRoomOwner(newOwner);
+                        log.info("방장 교체됨 - newOwner={} in roomId={}", newOwner, roomId);
+                    } else {
+                        session.setRoomOwner(null);
+                        log.info("방장 교체 불가 (참가자 없음) roomId={}", roomId);
+                    }
+                }
 
 
                 if (session.getParticipantsCount() == 0) {
@@ -143,6 +161,15 @@ public class RedisGameRoomSessionRegistry {
         }
     }
 
+    public void updateRoom(GameRoomSession session) {
+        try {
+            String json = objectMapper.writeValueAsString(session);
+            redisTemplate.opsForHash().put(KEY, session.getRoomId(), json);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to save GameRoomSession", e);
+            throw new RuntimeException(e);
+        }
+    }
 
 }
 

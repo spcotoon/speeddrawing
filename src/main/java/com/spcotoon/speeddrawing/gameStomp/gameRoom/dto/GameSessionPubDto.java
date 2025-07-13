@@ -24,11 +24,15 @@ public class GameSessionPubDto {
 
     private String roomOwner;
     private List<String> participants;
-    private int currentRound;
-    private int quizIndex;
     private Map<String, Integer> score;
-
     private Map<String, String> joinedAt;
+
+    private int quizTimeLimitSeconds;
+    private String currentQuizDrawer;
+    private int currentTurnIndex;
+    private String currentQuiz;
+    private int currentQuizIndex;
+    private long turnStartTimestamp;
 
     public GameSessionPubDto from(GameRoomSession gameRoomSession) {
         return GameSessionPubDto.builder()
@@ -39,10 +43,14 @@ public class GameSessionPubDto {
                 .maxCount(gameRoomSession.getMaxCount())
                 .roomOwner(gameRoomSession.getRoomOwner())
                 .participants(gameRoomSession.getParticipants())
-                .currentRound(gameRoomSession.getCurrentRound())
-                .quizIndex(gameRoomSession.getQuizIndex())
                 .score(gameRoomSession.getScore())
                 .joinedAt(gameRoomSession.getJoinedAt())
+                .quizTimeLimitSeconds(gameRoomSession.getQuizTimeLimitSeconds())
+                .currentQuizDrawer(gameRoomSession.getCurrentQuizDrawer())
+                .currentTurnIndex(gameRoomSession.getCurrentTurnIndex())
+                .currentQuiz(gameRoomSession.getCurrentQuiz())
+                .currentQuizIndex(gameRoomSession.getCurrentQuizIndex())
+                .turnStartTimestamp(gameRoomSession.getTurnStartTimestamp())
                 .build();
     }
 }

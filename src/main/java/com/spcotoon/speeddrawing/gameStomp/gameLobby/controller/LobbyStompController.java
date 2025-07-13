@@ -63,6 +63,9 @@ public class LobbyStompController {
             roomSessionRegistry.leaveRoom(roomId, nickname);
             userSessionRegistry.unregisterUserByKey(userSession.getRedisKey());  // 예: "member:xxx" 또는 "guest:yyy"
             GameRoomSession room = roomSessionRegistry.getRoom(roomId);
+
+            if (room == null) return;
+
             GameSessionPubDto gameSessionPubDto = new GameSessionPubDto();
             GameSessionPubDto dto = gameSessionPubDto.from(room);
             log.info("유저 {} 방에서 나감. roomId={}", nickname, roomId);

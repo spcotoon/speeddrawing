@@ -11,4 +11,5 @@ public class GameRoomChatMessageDto {
 
     private String nickname;
     private String content;
+    private GameChatType type;
 }
