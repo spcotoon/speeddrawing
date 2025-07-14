@@ -30,6 +30,7 @@ public class GameRoomSession {
 
     private int quizTimeLimitSeconds;
     private String currentQuizDrawer;
+    @Builder.Default
     private List<String> quizList = new ArrayList<>();
     private int currentTurnIndex;
     private int currentQuizIndex;

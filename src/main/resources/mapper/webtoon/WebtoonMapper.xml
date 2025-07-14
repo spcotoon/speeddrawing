@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.spcotoon.speeddrawing.webtoon.repository.WebtoonBodyRepository">
+
+    <resultMap id="WebtoonBodyUploadRespDtoMap" type="com.spcotoon.speeddrawing.webtoon.dto.WebtoonBodyUploadRespDto">
+        <result property="id" column="comic_body_id"/>
+        <result property="title" column="title"/>
+        <result property="thumbnailUrl" column="thumbnail_url"/>
+        <result property="updatedTime" column="updated_time"/>
+    </resultMap>
+
+    <select id="findAllByHeadIdOrderByUpdatedDateDesc"
+            resultMap="WebtoonBodyUploadRespDtoMap"
+            parameterType="Long">
+        SELECT
+        comic_body_id,
+        title,
+        thumbnail_url,
+        updated_time
+        FROM comic_body
+        WHERE comic_head_id = #{comicHeadId}
+        ORDER BY updated_time DESC
+    </select>
+</mapper>
