@@ -26,7 +26,9 @@ public class SecurityConfig {
       "/api/v1/member/login",
       "/api/v1/webtoon/**",
       "/connect/**",
-      "/h2-console/**"
+      "/h2-console/**",
+      "/swagger-ui/**",
+      "/v3/api-docs/**"
     };
 
 
