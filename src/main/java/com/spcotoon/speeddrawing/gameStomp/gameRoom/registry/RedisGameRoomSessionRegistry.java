@@ -43,7 +43,7 @@ public class RedisGameRoomSessionRegistry {
                     try {
                         return objectMapper.readValue(o.toString(), GameRoomSession.class);
                     } catch (IOException e) {
-                        log.error("Failed to deserialize GameRoomSession", e);
+                        log.error("Failed to deserialize GameRoomSession");
                         throw new RuntimeException(e);
                     }
                 }).toList();
@@ -56,7 +56,7 @@ public class RedisGameRoomSessionRegistry {
         try {
             return objectMapper.readValue(value.toString(), GameRoomSession.class);
         } catch (IOException e) {
-            log.error("Failed to deserialize GameRoomSession", e);
+            log.error("Failed to deserialize GameRoomSession");
             throw new RuntimeException(e);
         }
     }
@@ -166,7 +166,7 @@ public class RedisGameRoomSessionRegistry {
             String json = objectMapper.writeValueAsString(session);
             redisTemplate.opsForHash().put(KEY, session.getRoomId(), json);
         } catch (JsonProcessingException e) {
-            log.error("Failed to save GameRoomSession", e);
+            log.error("Failed to save GameRoomSession");
             throw new RuntimeException(e);
         }
     }
