@@ -1,4 +1,4 @@
-package com.spcotoon.speeddrawing.webtoon.dto;
+package com.spcotoon.speeddrawing.webtoon.dto.admin;
 
 import lombok.Data;
 

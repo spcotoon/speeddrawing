@@ -2,7 +2,7 @@ package com.spcotoon.speeddrawing.webtoon.controller;
 
 import com.spcotoon.speeddrawing.webtoon.domain.ComicBody;
 import com.spcotoon.speeddrawing.webtoon.domain.ComicHead;
-import com.spcotoon.speeddrawing.webtoon.dto.*;
+import com.spcotoon.speeddrawing.webtoon.dto.admin.*;
 import com.spcotoon.speeddrawing.webtoon.service.S3Service;
 import com.spcotoon.speeddrawing.webtoon.service.WebtoonUploadService;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +53,13 @@ public class WebtoonUploadController {
     @GetMapping("/body/list")
     public ResponseEntity<?> getComicBodyListOfOneHead(@RequestParam Long comicHeadId) {
         List<WebtoonBodyUploadRespDto> response = webtoonUploadService.getBodyList(comicHeadId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/body/one")
+    public ResponseEntity<?> getOneBodyContents(@RequestParam Long comicBodyId) {
+        WebtoonBodyContentsUploadRespDto response = webtoonUploadService.getOneBody(comicBodyId);
 
         return ResponseEntity.ok(response);
     }

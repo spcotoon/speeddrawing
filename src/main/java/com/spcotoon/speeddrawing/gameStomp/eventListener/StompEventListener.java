@@ -61,7 +61,6 @@ public class StompEventListener {
             userRegistry.registerUser(userSession);
             pushService.publishUserList(lobbyDataService.getCurrentUsers());
         }
-        // game-room 은 여기서 joinRoom 하지 않음 (Interceptor (StompHandler) 에서 이미 처리됨)
     }
 
     @EventListener
@@ -78,7 +77,6 @@ public class StompEventListener {
                     log.info("Lobby WebSocket Disconnect - sessionId: {}", sessionId);
                     pushService.publishUserList(lobbyDataService.getCurrentUsers());
                 }
-                // game-room disconnect는 pub 메시지에서 처리하므로 여기선 안함
             }
         }
     }

@@ -4,15 +4,13 @@ import com.spcotoon.speeddrawing.exception.custom.NotExistWebtoonException;
 import com.spcotoon.speeddrawing.webtoon.domain.ComicBody;
 import com.spcotoon.speeddrawing.webtoon.domain.ComicHead;
 import com.spcotoon.speeddrawing.webtoon.domain.ContentImageUrl;
-import com.spcotoon.speeddrawing.webtoon.dto.OneWebtoonHeadRespDto;
-import com.spcotoon.speeddrawing.webtoon.dto.WebtoonBodyUploadReqDto;
-import com.spcotoon.speeddrawing.webtoon.dto.WebtoonBodyUploadRespDto;
-import com.spcotoon.speeddrawing.webtoon.dto.WebtoonHeadUploadReqDto;
+import com.spcotoon.speeddrawing.webtoon.dto.admin.*;
 import com.spcotoon.speeddrawing.webtoon.repository.WebtoonBodyJpaRepository;
 import com.spcotoon.speeddrawing.webtoon.repository.WebtoonBodyRepository;
 import com.spcotoon.speeddrawing.webtoon.repository.WebtoonHeadJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +23,7 @@ public class WebtoonUploadService {
     private final WebtoonBodyJpaRepository bodyRepository;
     private final WebtoonBodyRepository bodyMybatisRepository;
 
+    @Transactional
     public ComicHead headUpload(WebtoonHeadUploadReqDto reqDto) {
         ComicHead comicHead = reqDto.toEntity();
         return headRepository.save(comicHead);
@@ -35,11 +34,16 @@ public class WebtoonUploadService {
         return headRepository.findAll();
     }
 
+    @Transactional
     public ComicBody bodyUpload(WebtoonBodyUploadReqDto reqDto) {
 
         ComicHead comicHead = headRepository.findById(Long.valueOf(reqDto.getHeadId())).orElseThrow(NotExistWebtoonException::new);
 
+        Long maxNumber = bodyRepository.findMaxNumberByComicHeadId(comicHead.getId());
+        Long nextNumber = (maxNumber == null || maxNumber == 0) ? 1L : maxNumber + 1L;
+
         ComicBody comicBody = ComicBody.builder()
+                .number(nextNumber)
                 .title(reqDto.getTitle())
                 .authorComment(reqDto.getAuthorComment())
                 .thumbnailUrl(reqDto.getThumbnailUrl())
@@ -55,6 +59,13 @@ public class WebtoonUploadService {
         comicBody.getContentImageUrls().addAll(imageUrls);
 
         return bodyRepository.save(comicBody);
+    }
+
+    public WebtoonBodyContentsUploadRespDto getOneBody(Long comicBodyId) {
+        ComicBody comicBody = bodyRepository.findById(comicBodyId)
+                .orElseThrow(NotExistWebtoonException::new);
+
+        return WebtoonBodyContentsUploadRespDto.from(comicBody);
     }
 
 

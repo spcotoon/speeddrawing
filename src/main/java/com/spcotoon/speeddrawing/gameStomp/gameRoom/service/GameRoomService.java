@@ -128,9 +128,6 @@ public class GameRoomService {
         GameRoomSession session = gameSessionRegistry.getRoom(roomId);
         if(session==null) throw new RuntimeException("방이 존재하지 않습니다");
 
-        int participantCount = session.getParticipantsCount();
-
-
         List<String> quizList = quizRepository.findRandomQuizzes(10).stream().map(Quiz::getWord).toList();
 
         session.setQuizList(quizList);

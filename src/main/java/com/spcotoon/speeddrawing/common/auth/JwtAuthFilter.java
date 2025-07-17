@@ -1,6 +1,5 @@
 package com.spcotoon.speeddrawing.common.auth;
 
-import com.spcotoon.speeddrawing.common.service.EnvService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.*;
@@ -31,8 +30,6 @@ import java.util.List;
 public class JwtAuthFilter extends GenericFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final EnvService envService;
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
@@ -83,7 +80,6 @@ public class JwtAuthFilter extends GenericFilter {
             httpServletResponse.setContentType(String.valueOf(MediaType.APPLICATION_JSON));
             httpServletResponse.getWriter().write("invalid token");
             httpServletResponse.getWriter().flush();
-            return;
         }
     }
 }

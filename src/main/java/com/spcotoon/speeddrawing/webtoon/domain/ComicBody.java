@@ -20,6 +20,7 @@ public class ComicBody extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comic_body_id")
     private Long id;
+    private Long number;
     private String title;
     private String thumbnailUrl;
     private String authorComment;
@@ -33,6 +34,7 @@ public class ComicBody extends BaseTimeEntity {
 
     @Builder
     public ComicBody(Long number, String title, String thumbnailUrl, String authorComment, List<String> contentUrl, ComicHead comicHead) {
+        this.number = number;
         this.title = title;
         this.thumbnailUrl = thumbnailUrl;
         this.authorComment = authorComment;

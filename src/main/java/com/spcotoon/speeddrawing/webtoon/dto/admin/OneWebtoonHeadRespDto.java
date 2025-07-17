@@ -1,10 +1,8 @@
-package com.spcotoon.speeddrawing.webtoon.dto;
+package com.spcotoon.speeddrawing.webtoon.dto.admin;
 
 import com.spcotoon.speeddrawing.webtoon.domain.ComicHead;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 public class OneWebtoonHeadRespDto {

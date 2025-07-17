@@ -24,6 +24,7 @@ public class SecurityConfig {
       "/health",
       "/api/v1/member/create",
       "/api/v1/member/login",
+      "/api/v1/webtoon/**",
       "/connect/**",
       "/h2-console/**"
     };
@@ -46,7 +47,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(PUBLIC_URLS).permitAll()
-                        .requestMatchers("/api/v1/quiz/upload").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/quiz/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/webtoon-upload/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers

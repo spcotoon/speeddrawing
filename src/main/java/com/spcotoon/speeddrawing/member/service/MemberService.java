@@ -1,6 +1,5 @@
 package com.spcotoon.speeddrawing.member.service;
 
-import com.spcotoon.speeddrawing.common.service.EnvService;
 import com.spcotoon.speeddrawing.exception.custom.AlreadyExistEmailException;
 import com.spcotoon.speeddrawing.exception.custom.AlreadyExistNicknameException;
 import com.spcotoon.speeddrawing.exception.custom.InvalidLoginException;
@@ -23,8 +22,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EnvService envService;
-
     public Member create(MemberCreateReqDto dto, HttpServletRequest request) {
 
         String clientIp = request.getRemoteAddr();
@@ -53,13 +50,9 @@ public class MemberService {
 
             return member;
         } catch (Exception e) {
-            if (envService.isProd()) {
-                log.warn("회원 가입 실패 | Email: {} | IP: {} | User-Agent: {} | 오류: {}",
+
+            log.warn("회원 가입 실패 | Email: {} | IP: {} | User-Agent: {} | 오류: {}",
                         dto.getEmail(), clientIp, userAgent, e.getMessage());
-            } else {
-                log.warn("회원 가입 실패 | Email: {} | IP: {} | User-Agent: {} | 오류: {}",
-                        dto.getEmail(), clientIp, userAgent, e.getMessage(), e);
-            }
 
             throw e;
         }

@@ -56,12 +56,11 @@ public class LobbyStompController {
             return;
         }
 
-        // nickname 기준으로 UserSession 찾기 (추가 메서드 필요)
         UserSession userSession = userSessionRegistry.getUserByNickname(nickname);
 
         if (userSession != null && roomId.equals(userSession.getRoomId())) {
             roomSessionRegistry.leaveRoom(roomId, nickname);
-            userSessionRegistry.unregisterUserByKey(userSession.getRedisKey());  // 예: "member:xxx" 또는 "guest:yyy"
+            userSessionRegistry.unregisterUserByKey(userSession.getRedisKey());
             GameRoomSession room = roomSessionRegistry.getRoom(roomId);
 
             if (room == null) return;
