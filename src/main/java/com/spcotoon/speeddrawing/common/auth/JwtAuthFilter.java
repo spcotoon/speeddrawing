@@ -75,7 +75,6 @@ public class JwtAuthFilter extends GenericFilter {
 
             log.warn("JWT 검증 실패 | ip={} | uri={} | userAgent={} | tokenSnippet={} | error={}",
                     clientIp, uri, ua, snippet, e.getMessage());
-            log.debug("JWT parse error stacktrace", e);
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             httpServletResponse.setContentType(String.valueOf(MediaType.APPLICATION_JSON));
             httpServletResponse.getWriter().write("invalid token");
