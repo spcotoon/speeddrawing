@@ -1,9 +1,7 @@
 package com.spcotoon.speeddrawing.common.config;
 
 import com.spcotoon.speeddrawing.common.auth.JwtAuthFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,6 +46,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(configurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(PUBLIC_URLS).permitAll()
                         .requestMatchers("/api/v1/quiz/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/webtoon-upload/**").hasRole("ADMIN")

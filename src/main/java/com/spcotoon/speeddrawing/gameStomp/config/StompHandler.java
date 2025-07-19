@@ -1,11 +1,6 @@
 package com.spcotoon.speeddrawing.gameStomp.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spcotoon.speeddrawing.common.auth.JwtTokenProvider;
-import com.spcotoon.speeddrawing.common.auth.JwtTokenUserInfo;
-import com.spcotoon.speeddrawing.exception.custom.FullRoomException;
-import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.LobbyDataService;
-import com.spcotoon.speeddrawing.gameStomp.gameLobby.service.RedisLobbyPushService;
 import com.spcotoon.speeddrawing.gameStomp.gameRoom.registry.RedisGameRoomSessionRegistry;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;

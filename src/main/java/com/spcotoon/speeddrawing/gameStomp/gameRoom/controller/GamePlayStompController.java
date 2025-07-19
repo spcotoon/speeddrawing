@@ -12,8 +12,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Controller
