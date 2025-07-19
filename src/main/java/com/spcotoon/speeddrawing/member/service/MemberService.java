@@ -24,7 +24,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     public Member create(MemberCreateReqDto dto, HttpServletRequest request) {
 
-        String clientIp = request.getRemoteAddr();
+        String clientIp = request.getHeader("X-Forwarded-For");
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
 
@@ -60,7 +60,7 @@ public class MemberService {
     }
 
     public Member login(MemberLoginReqDto dto, HttpServletRequest request) {
-        String clientIp = request.getRemoteAddr();
+        String clientIp = request.getHeader("X-Forwarded-For");
         String userAgent = request.getHeader("User-Agent");
 
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(() -> {

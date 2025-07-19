@@ -36,7 +36,7 @@ public class WebtoonService {
 
     public List<WebtoonListResponse> getAllWebtoons(HttpServletRequest request) {
 
-        String clientIp = request.getRemoteAddr();
+        String clientIp = request.getHeader("X-Forwarded-For");
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
 
@@ -49,7 +49,7 @@ public class WebtoonService {
     }
 
     public WebtoonTitleResponse getOneWebtoonTitle(Long comicHeadId, HttpServletRequest request) {
-        String clientIp = request.getRemoteAddr();
+        String clientIp = request.getHeader("X-Forwarded-For");
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
 
@@ -70,7 +70,7 @@ public class WebtoonService {
     }
 
     public WebtoonContentResponse getOneWebtoon(Long comicHeadId, Long number, HttpServletRequest request) {
-        String clientIp = request.getRemoteAddr();
+        String clientIp = request.getHeader("X-Forwarded-For");
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
 

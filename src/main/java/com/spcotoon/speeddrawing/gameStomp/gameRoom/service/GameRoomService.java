@@ -49,7 +49,7 @@ public class GameRoomService {
         String authHeader = request.getHeader("Authorization");
         String nickname = "";
 
-        String clientIp = request.getRemoteAddr();
+        String clientIp = request.getHeader("X-Forwarded-For");
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
 
@@ -84,7 +84,7 @@ public class GameRoomService {
         String authHeader = request.getHeader("Authorization");
         String nickname = "";
         Long memberId = null;
-        String clientIp = request.getRemoteAddr();
+        String clientIp = request.getHeader("X-Forwarded-For");
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
 

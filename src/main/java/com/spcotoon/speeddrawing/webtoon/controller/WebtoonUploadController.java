@@ -107,7 +107,7 @@ public class WebtoonUploadController {
             String fileExtension = getFileExtension(fileName);
             String uniqueFileName = generateUniqueFileName(fileName, fileExtension);
 
-            String s3Path = "comics/" + uniqueFileName;
+            String s3Path = "webtoon/" + uniqueFileName;
 
             String presignedUrl = s3Service.createPresignedUrl(s3Path);
             presignedUrls.add(presignedUrl);

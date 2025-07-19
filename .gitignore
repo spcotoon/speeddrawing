@@ -38,4 +38,5 @@ out/
 
 ### Security ###
 application.yml
+aws-application.yml
 logs/
